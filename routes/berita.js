@@ -1,12 +1,14 @@
 var express = require('express');
 var router = express.Router();
 
-const auth = require('../auth');
 const upload = require("../middleware/upload");
 const db = require('../models');
 const Berita = db.beritas;
 const Komentar = db.komentars;
 const Op = db.Sequelize.Op;
+
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
 
 // Get All Berita
 // GET
@@ -53,43 +55,34 @@ router.get('/list/page/:halaman', function (req, res, next) {
         });
 });
 
-// // Create (Post) Sebuah Berita
-// // GET
-// router.get('/tambah', auth, function (req, res, next) {
-//     res.render('formtambahberita', {
-//         title: 'Tambah Berita',
-//         msg: ""
-//     });
-// });
+// Create Sebuah Berita
+// POST
+router.post('/tambah',
+    passport.authenticate("jwt", { session: false }),
+    upload.single('image'),
+    function (req, res, next) {
+        try {
+            const readFileFromPublic = req.file.path;
+            var berita = {
+                title: req.body.title,
+                highlight: req.body.highlight,
+                content: req.body.content,
+                image: readFileFromPublic,
+            }
 
-// // POST
-// router.post('/tambah', auth, upload.single('image'), function (req, res, next) {
-//     try {
-//         if (req.file == undefined) {
-//             return res.render('formtambahberita', {
-//                 title: 'Tambah Berita',
-//                 msg: "Tolong Upload Sebuah File Image"
-//             });
-//         }
+            Berita.create(berita)
+                .then((data) => {
+                    res.json({
+                        info: "Berita Berhasil Ditambahkan",
+                        berita: data,
+                    });
+                });
 
-//         const readFileFromPublic = req.file.path;
-//         var berita = {
-//             title: req.body.title,
-//             highlight: req.body.highlight,
-//             content: req.body.content,
-//             image: readFileFromPublic,
-//         }
-
-//         Berita.create(berita)
-//             .then(() => {
-//                 return res.redirect('/');
-//             });
-
-//     } catch (error) {
-//         console.log(error);
-//         return res.send(`Error when trying upload images: ${error}`);
-//     }
-// });
+        } catch (error) {
+            console.log(error);
+            return res.send(`Error when trying upload images: ${error}`);
+        }
+    });
 
 // // Read (Get Detail) Sebuah Berita
 // // GET
