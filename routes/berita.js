@@ -124,27 +124,32 @@ router.put('/ubah/:id',
 
     });
 
-// // Delete (Soft Delete) Sebuah Berita
-// // GET
-// router.get('/hapus/:id', auth, function (req, res, next) {
-//     var id = parseInt(req.params.id);
+// Delete (Soft Delete) Sebuah Berita
+// DELETE
+router.delete('/hapus/:id',
+    passport.authenticate("jwt", { session: false }),
+    function (req, res, next) {
+        var id = parseInt(req.params.id);
 
-//     try {
-//         var berita = {
-//             isDelete: true,
-//         }
+        try {
+            var berita = {
+                isDelete: true,
+            }
 
-//         Berita.update(berita, {
-//             where: { id: id }
-//         })
-//             .then(() => {
-//                 return res.redirect('/');
-//             });
+            Berita.update(berita, {
+                where: { id: id }
+            })
+                .then(() => {
+                    res.json({
+                        info: "Berita Dengan Id= " + id + " Berhasil Dihapus (Soft Delete)",
+                        berita: berita,
+                    });
+                });
 
-//     } catch (error) {
-//         return res.send(`Error when trying to delete berita: ${error}`);
-//     }
+        } catch (error) {
+            return res.send(`Error when trying to delete berita: ${error}`);
+        }
 
-// });
+    });
 
 module.exports = router;

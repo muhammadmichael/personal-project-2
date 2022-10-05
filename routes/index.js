@@ -12,26 +12,6 @@ const config = require('../config')
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
-// Get all berita (Including deleted berita)
-// GET
-router.get('/getall', function(req, res, next) {
-
-  Berita.findAll()
-  .then(data => {
-    res.json({
-      info: "Berhasil Mendapatkan List Berita",
-      beritas: data
-    });
-  })
-  .catch(err => {
-    res.json({
-      info: "Error",
-      message: err.message,
-      beritas: []
-    });
-  });
-});
-
 // Create a user
 // POST
 router.post('/register', function (req, res, next) {
@@ -73,13 +53,13 @@ router.post('/login', function (req, res, next) {
             userid: data.id,
             username: data.username
           };
-          
+
           // Create token by using jwt
           let token = jwt.sign(
             payload,
             config.secret, {
-              expiresIn: '3h'
-            }
+            expiresIn: '3h'
+          }
           );
 
           let dt = new Date(); // now
