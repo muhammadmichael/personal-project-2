@@ -10,11 +10,13 @@ const Op = db.Sequelize.Op;
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
-// Get All Berita (Including Soft Deleted Berita)
+// Get All Berita (!Including Soft Deleted Berita)
 // GET
 router.get('/list', function (req, res, next) {
 
-    Berita.findAll()
+    Berita.findAll(
+        {where: { isDelete: false }}
+    )
         .then(data => {
             res.json({
                 info: "Berhasil Mendapatkan List Berita",

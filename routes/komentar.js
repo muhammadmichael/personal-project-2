@@ -10,7 +10,7 @@ const Op = db.Sequelize.Op;
 // Create (Post) Sebuah Komentar
 // POST
 router.post('/tambah/:id', function (req, res, next) {
-    // Params id disini adalah id berita yang memiliki tersebut
+    // Params id disini adalah id berita yang memiliki komentar tersebut
     var id = parseInt(req.params.id);
 
     try {
