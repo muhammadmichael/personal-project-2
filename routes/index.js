@@ -39,11 +39,6 @@ router.post('/register', function (req, res, next) {
 });
 
 // Login
-// GET
-router.get('/login', function (req, res, next) {
-  res.render('loginform', { title: 'Express' });
-});
-
 // POST
 router.post('/login', function (req, res, next) {
 
@@ -53,16 +48,36 @@ router.post('/login', function (req, res, next) {
         var loginValid = bcrypt.compareSync(req.body.password, data.password);
         if (loginValid) {
 
-          // simpan session
-          req.session.username = req.body.username;
-          req.session.islogin = true;
+          // Create payload for token
+          var payload = {
+            userid: data.id,
+            username: data.username
+          };
 
-          res.redirect('/');
+          // Create token by using jwt
+          let token = jwt.sign(
+            payload,
+            config.secret, {
+            expiresIn: '3h'
+          }
+          );
+
+          let dt = new Date(); // now
+          dt.setHours(dt.getHours() + 3);
+          res.json({
+            success: true,
+            token: token,
+            expired: dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString()
+          });
         } else {
-          res.redirect('/login')
+          res.json({
+            info: "Gagal Login",
+          });
         }
       } else {
-        res.redirect('/login')
+        req.json({
+          info: "Gagal Login",
+        });
       }
     })
     .catch(err => {
@@ -76,8 +91,9 @@ router.post('/login', function (req, res, next) {
 
 // Logout
 router.get('/logout', function (req, res, next) {
-  req.session.destroy();
-  res.redirect('/login');
+  res.json({
+    info: "Logout Sukses"
+  })
 });
 
 module.exports = router;
